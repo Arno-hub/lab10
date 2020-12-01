@@ -1,0 +1,139 @@
+Question 1 
+On importe les fichiers max.c min.c var.c max.h ....
+
+Question 2
+On créé un fichier Makefile afin de pouvoir compiler les fichiers sources et créer un binaire de sortie.
+
+Pour compiler le fichier max.c en max.o, on rentre la commande suivante dans le fichier Makefile : 
+
+max.o : max.c
+        gcc -Wall -c max.c
+Pour générer l'executable final de ce projet, on applique la commande suivante :  
+test.exe : test.o max.o min.o var.o
+        gcc -g -Wall -o test.exe test.o max.o min.o var.o 
+ 
+On obtient un fichier executable nommé test qui à l'execution renvoit le max, min, variance d'un tableau d'entier
+
+On déplace ensuite ce fichier test dans la variable d'environnement $HOME via la commande suivante : 
+
+install : test.exe
+        cp test.exe ${HOME} 
+
+On peut aussi ajouter une ligne de commande dans le fichier MAkefile afin de supprimer les fichiers .o inutile : 
+clean: 
+        rm max.o min.o var.o test.o
+
+Question 3
+En executant les commandes suivantes : 
+
+make --> On remarque qu'on compile la première ligne de commande écrite dans le Makefile, qui est la génération du .o du fichier max.c
+
+make install --> On remarque que l'executable créé en l'occurance "test" est déplacé dans la variable d'environnement $HOME 
+
+make min.o --> génère le .o du fichier min.c 
+
+make clean --> supprime tous les fichiers.o qui sont rentrés dans les règles de la fonction clean du Make 
+
+Si on indique pas la cible la règle ne peut pas être correctement executée et l'action désirée ne peut pas être accomplie
+
+Question 4/5
+
+On rentre les variable suivante dans le fichier Makefile : 
+
+CC = gcc
+OBJ = max.o min.o var.o
+CC_OPTIONS = -g -Wall
+
+Pour vérifier si la modification CC_OPTIONS = -g -Wall a bien été prise en compte, on modifie dans la cible "test" la commande  -g -Wall par sa variable ${CC_OPTION} tel que :
+ test.exe : test.o ${OBJ}
+        ${cc} ${CC_OPTION} -o test.exe test.o max.o min.o var.o
+
+Après avoir tapé make test, on a bien création de l'executable, la modification a été pris en compte.
+
+
+Question 6
+
+On se propose de créer le nouveau makefile avec des variables automatiques tel que : 
+
+CC = gcc
+OBJ = max.o min.o var.o
+CC_OPTIONS = -g -Wall
+
+max.o : max.c
+        ${CC} ${CC_OPTIONS} -c $^
+
+min.o : min.c
+        ${CC} ${CC_OPTIONS} -c $^
+
+var.o : var.c
+        ${CC} ${CC_OPTIONS} -c $^
+
+test.o : test.c
+        ${CC} ${CC_OPTIONS} -c $^
+
+test.exe : test.o ${OBJ}
+        ${CC} ${CC_OPTIONS} -o $@ $< ${OBJ} 
+
+install : test.exe
+        mv test.exe ${HOME}
+
+clean: 
+        rm ${OBJ}
+
+Question 7/9
+
+On souhaite créer un binaire test en mode DEBUG ou release, pour cela on défini la variable DEBUG tel que si DEBUG=yes alors la compilation du binaire se fait en mode DEBUG Sinon elle se fait en mode release c'est à dire sans les informations d'erreurs qu'il y aurait pu avoir lors de la compilation donc sans le ' -g -Wall '.Par ailleurs on affiche le type de compilation qui a été choisie : 'DEBUG' ou 'release' en fonction du choix de l'utlisateur via la variable Mode qui affiche à la compilation Mode DEBUG Ou mode Release. On se propose d'écrire le make file suivant : 
+
+CC= gcc
+OBJ= max.o min.o var.o
+
+ifeq (${DEBUG},yes)
+        CC_OPTIONS=-g -Wall
+        MODE= Mode Debug
+else
+        CC_OPTIONS=
+        MODE= Mode Release
+endif
+mode : test.exe
+        @echo "$(MODE)"
+
+max.o : max.c
+        ${CC} ${CC_OPTIONS} -c $^
+
+min.o : min.c
+        ${CC} ${CC_OPTIONS} -c $^
+
+var.o : var.c
+        ${CC} ${CC_OPTIONS} -c $^
+
+test.o : test.c
+        ${CC} ${CC_OPTIONS} -c $^
+
+test.exe : test.o ${OBJ}
+        ${CC} ${CC_OPTIONS} -o $@ $< ${OBJ} 
+
+install : test.exe
+        mv test.exe ${HOME}
+
+clean: 
+        rm ${OBJ}
+
+Question 8
+
+Lorsque l'on réalise la compilation du fichier test via la commande make DEBUG=yes pour la compilaion en mode DEBUG. J'obtiens à l'affichage dans le terminal, la compilation suivante : 
+gcc -g -Wall -c test.c
+gcc -g -Wall -c max.c
+gcc -g -Wall -c min.c
+gcc -g -Wall -c var.c
+gcc -g -Wall -o test.exe test.o max.o min.o var.o 
+Mode Debug
+
+Lorsque je compile en mode release, j'obtiens à l'affichage la compilation suivante : 
+gcc  -c test.c
+gcc  -c max.c
+gcc  -c min.c
+gcc  -c var.c
+gcc  -o test.exe test.o max.o min.o var.o 
+Mode Release
+
+L'execution du fichier test ce fait par ailleurs correctement.
