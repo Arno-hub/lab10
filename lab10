@@ -19,7 +19,7 @@ On déplace ensuite ce fichier test dans la variable d'environnement $HOME via l
 install : test.exe
         cp test.exe ${HOME} 
 
-On peut aussi ajouter une ligne de commande dans le fichier MAkefile afin de supprimer les fichiers .o inutile : 
+On peut aussi ajouter une ligne de commande dans le fichier Makefile afin de supprimer les fichiers .o inutiles : 
 clean: 
         rm max.o min.o var.o test.o
 
@@ -46,7 +46,7 @@ CC_OPTIONS = -g -Wall
 
 Pour vérifier si la modification CC_OPTIONS = -g -Wall a bien été prise en compte, on modifie dans la cible "test" la commande  -g -Wall par sa variable ${CC_OPTION} tel que :
  test.exe : test.o ${OBJ}
-        ${cc} ${CC_OPTION} -o test.exe test.o max.o min.o var.o
+        ${cc} ${CC_OPTION} -o test.exe test.o ${OBJ}
 
 Après avoir tapé make test, on a bien création de l'executable, la modification a été pris en compte.
 
